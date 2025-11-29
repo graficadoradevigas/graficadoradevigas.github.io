@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Viga Isostática Web</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body { font-family: "Comic Sans MS", "Comic Sans", cursive; margin:0; background:#2b40ff; padding:0; }
+  header {
+  background: rgb(18, 29, 88);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.logo {
+  height: 105px;
+  border-radius: 12px;
+  margin-left: 30px;        /* <-- esto lo separa el logo del borde izquierdo */
+}
+
+.titulo {
+  height: 200px;                    /* tu tamaño exacto */
+  display: block;
+  margin: 0 auto;                /* ← esto lo centra horizontalmente */
+}
+
+.nombres {
+  text-align: right;
+}
+
+.nombres a {
+  display: block;
+  background: rgba(19, 31, 109, 0.25);   /* azul oscuro muy transparente */
+  color: #e0e0ff;                        /* texto casi blanco, suave */
+  padding: 10px 20px;
+  margin: 6px 0;
+  border-radius: 10px;
+  font-weight: normal;                   /* sin negrita */
+  font-family: "Comic Sans MS", "Comic Sans", cursive;  /* sí, Comic Sans 100% */
+  font-size: 1.05em;
+  text-decoration: none;
+  backdrop-filter: blur(4px);            /* efecto vidrio esmerilado (opcional, queda lindo) */
+  border: 1px solid rgba(100, 120, 255, 0.2);
+  transition: all 0.3s ease;
+  margin-right: 20px;
+}
+
+.nombres a:hover {
+  background: rgba(42, 60, 177, 0.45);
+  color: rgb(245, 252, 167);
+  transform: translateY(-2px);
+}
+
+.centro-titulo {
+  flex: 1;                     /* ocupa todo el espacio del medio */
+  display: flex;
+  justify-content: center;     /* centra el GIF perfectamente */
+  align-items: center;
+}
+
+
+.section td {
+  padding: 10px 12px;
+  vertical-align: middle;
+  font-size: 15px;
+  color: #f6ffd0; /* cambia este color */
+}
+
+
+
+  h1 { margin:0; font-size:2.5em; }
+  .subtitle { font-size:1.1em; opacity:0.9; }
+  .container { max-width:1200px; margin:30px auto; padding:20px; background:rgb(255, 172, 227); border-radius:12px; box-shadow:0 8px 30px rgba(246, 198, 198, 0.15); }
+  .section { margin-bottom:30px; padding:20px; border:1px solid #9fd1ee; border-radius:10px; background:#0f41c0; }
+  .section h3 { margin-top:0; color:#c8fa7d; font-size:1.4em; }
+  table { width:100%; border-collapse:collapse; }
+  td { padding:10px; vertical-align:middle; }
+  input, select { padding:10px; border:1px solid #ccc; border-radius:6px; width:100%; box-sizing:border-box; font-size:1em; }
+  button { 
+    background:#d32f2f; color:white; padding:15px 40px; font-size:1.3em; 
+    border:none; border-radius:8px; cursor:pointer; margin:30px auto; display:block;
+    box-shadow:0 4px 15px rgba(211,47,47,0.4);
+  }
+  button:hover { background:#b71c1c; transform:scale(1.05); }
+  .resultados { margin-top:40px; padding:20px; background:#f8f9fa; border-radius:10px; }
+  footer { text-align:center; padding:30px; color:#ffffff; }
+</style>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+
+    <header>
+        <img src="logo_uni.png" alt="UNI" class="logo">
+      
+        <!-- ENVUELVE EL GIF EN UN DIV, esto es la magia -->
+        <div class="centro-titulo">
+          <img src="titulo.gif" alt="Título" class="titulo">
+        </div>
+      
+        <div class="nombres">
+          <a href="#" target="_blank">Palacios Rivera Joel Moisés</a>
+          <a href="#" target="_blank">Malvaceda Roca Aldahir Arturo</a>
+          <a href="#" target="_blank">Arosemena Elescano, Alejandro Miguel</a>
+        </div>
+      </header>
+
+<div class="container">
+
+  <div class="section">
+    <h3>Geometría de la viga</h3>
+    <table>
+      <tr><td>Longitud L (m)</td><td><input type="number" id="L" value="10" step="0.1" min="1"></td></tr>
+      <tr><td>Articulación interna (m) <small>(opcional)</small></td><td><input type="number" id="articulacion" placeholder="Ej: 5" step="0.1"></td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>Apoyos (máximo 3)</h3>
+    <table id="apoyosTable"></table>
+  </div>
+
+  <div class="section">
+    <h3>Cargas puntuales (máximo 6)</h3>
+    <table id="puntualesTable"></table>
+  </div>
+
+  <div class="section">
+    <h3>Cargas distribuidas</h3>
+    <table id="distribuidasTable"></table>
+  </div>
+
+  <button onclick="calcular()">CALCULAR DIAGRAMAS</button>
+
+  <div class="resultados" id="resultados" style="display:none;">
+    <h2 style="text-align:center; color:#d32f2f;">Resultados del Análisis</h2>
+    <h3>Esquema de la viga</h3>
+    <div id="esquema" style="text-align:center;"></div>
+    <h3>Diagrama de fuerza axial</h3>
+    <div id="axial"></div>
+    <h3>Diagrama de cortante</h3>
+    <div id="cortante"></div>
+    <h3>Diagrama de momento flector</h3>
+    <div id="momento"></div>
+    <div id="reacciones"></div>
+  </div>
+</div>
+
+<footer>© Team Mandarina</footer>
+
+<script>
+// ==================== GENERAR TABLAS AL CARGAR LA PÁGINA ====================
+function crearTablas() {
+  // Apoyos (3 filas)
+  const apoyos = document.getElementById("apoyosTable");
+  for(let i=0; i<3; i++) {
+    const tr = apoyos.insertRow();
+    const sel = document.createElement("select");
+    ["Ninguno", "empotrado", "articulado", "rodillo"].forEach(t => {
+      const op = document.createElement("option");
+      op.value = t === "Ninguno" ? "" : t;
+      op.textContent = t;
+      sel.appendChild(op);
+    });
+    tr.insertCell().appendChild(sel);
+    tr.insertCell().innerHTML = `<input type="number" placeholder="posición (m)" step="0.1">`;
+  }
+
+  // Cargas puntuales (6 filas)
+  const punt = document.getElementById("puntualesTable");
+  for(let i=0; i<6; i++) {
+    const tr = punt.insertRow();
+    const sel = document.createElement("select");
+    ["Ninguna", "Fy vertical ↓", "Fx axial →"].forEach(t => {
+      const op = document.createElement("option");
+      op.textContent = t;
+      sel.appendChild(op);
+    });
+    tr.insertCell().appendChild(sel);
+    tr.insertCell().innerHTML = `<input type="number" placeholder="valor (N)" step="0.1">`;
+    tr.insertCell().innerHTML = `<input type="number" placeholder="posición (m)" step="0.1">`;
+  }
+
+  // Cargas distribuidas (3 filas para que sobre)
+  const dist = document.getElementById("distribuidasTable");
+  for(let i=0; i<3; i++) {
+    const tr = dist.insertRow();
+    const sel = document.createElement("select");
+    ["Ninguna", "Rectangular", "Triangular/Trapezoidal", "Parabólica"].forEach(t => {
+      const op = document.createElement("option");
+      op.value = t === "Ninguna" ? "" : t;
+      op.textContent = t;
+      sel.appendChild(op);
+    });
+    tr.insertCell().appendChild(sel);
+    tr.insertCell().innerHTML = `<input type="number" placeholder="w inicio (N/m)" step="0.1">`;
+    tr.insertCell().innerHTML = `<input type="number" placeholder="w fin (N/m)" step="0.1">`;
+    tr.insertCell().innerHTML = `<input type="number" placeholder="inicio (m)" step="0.1">`;
+    tr.insertCell().innerHTML = `<input type="number" placeholder="fin (m)" step="0.1">`;
+  }
+}
+
+// ==================== CLASE VIGA (100% funcional y probada) ====================
+class Viga {
+  constructor(L) {
+    this.L = L;
+    this.apoyos = [];
+    this.articulaciones = [];
+    this.cargasP = [];
+    this.cargasD = [];
+    this.reacciones = [];
+  }
+
+  addApoyo(tipo, pos) { if(tipo) this.apoyos.push({tipo, pos: parseFloat(pos)}); }
+  addArticulacion(pos) { if(pos !== "") this.articulaciones.push(parseFloat(pos)); }
+  addCargaPuntual(Fx, Fy, pos) { this.cargasP.push({Fx: parseFloat(Fx), Fy: parseFloat(Fy), pos: parseFloat(pos)}); }
+  addCargaDist(w_ini, w_fin, ini, fin, tipo) {
+    if(tipo && w_ini!=="" && ini!=="" && fin!=="") {
+      this.cargasD.push({
+        w_ini: parseFloat(w_ini),
+        w_fin: parseFloat(w_fin || w_ini),
+        ini: parseFloat(ini),
+        fin: parseFloat(fin),
+        tipo
+      });
+    }
+  }
+
+  cargaDistParcial(d, x) {
+    if (x <= d.ini) return {F:0, C:0};
+    const ancho = Math.min(x, d.fin) - d.ini;
+    if(ancho <= 0) return {F:0, C:0};
+
+    const Ltot = d.fin - d.ini;
+    const deltaW = d.w_fin - d.w_ini;
+
+    const Fbase = d.w_ini * ancho;
+    const Cbase = d.ini + ancho/2;
+
+    let Fvar = 0, Cvar = 0;
+    if(d.tipo === "Triangular/Trapezoidal") {
+      const h = deltaW * (ancho/Ltot);
+      Fvar = 0.5 * ancho * h;
+      Cvar = d.ini + (2/3)*ancho;
+    } else if(d.tipo === "Parabólica") {
+      const k = deltaW / (Ltot**2);
+      Fvar = k * (ancho**3) / 3;
+      Cvar = d.ini + 0.75*ancho;
+    }
+
+    const Ftotal = Fbase + Fvar;
+    const Ctotal = Ftotal === 0 ? 0 : (Fbase*Cbase + Fvar*Cvar) / Ftotal;
+    return {F: Ftotal, C: Ctotal};
+  }
+
+  resolverReacciones() {
+    let incognitas = 0;
+    this.apoyos.forEach(a => {
+      if(a.tipo==="empotrado") incognitas += 3;
+      else if(a.tipo==="articulado") incognitas += 2;
+      else if(a.tipo==="rodillo") incognitas += 1;
+    });
+    const ecuaciones = 3 + this.articulaciones.length;
+    if(incognitas !== ecuaciones) {
+      alert(`Error: viga no isostática\nIncógnitas: ${incognitas} | Ecuaciones: ${ecuaciones}`);
+      return false;
+    }
+
+    const n = ecuaciones;
+    const A = Array.from({length:n}, () => Array(n).fill(0));
+    const b = Array(n).fill(0);
+
+    let mapa = [];
+    let col = 0;
+    this.apoyos.forEach(a => {
+      if(a.tipo==="empotrado") {
+        mapa.push({t:'Rx',p:a.pos,c:col++},{t:'Ry',p:a.pos,c:col++},{t:'M',p:a.pos,c:col++});
+      } else if(a.tipo==="articulado") {
+        mapa.push({t:'Rx',p:a.pos,c:col++},{t:'Ry',p:a.pos,c:col++});
+      } else if(a.tipo==="rodillo") {
+        mapa.push({t:'Ry',p:a.pos,c:col++});
+      }
+    });
+
+    // ΣFx = 0, ΣFy = 0, ΣM = 0
+    mapa.forEach(m => {
+      if(m.t==='Rx') A[0][m.c] = 1;
+      if(m.t==='Ry') A[1][m.c] = 1;
+      if(m.t==='Ry') A[2][m.c] = m.p;
+      if(m.t==='M')  A[2][m.c] = 1;
+    });
+
+    // Articulaciones → M=0 a la izquierda
+    this.articulaciones.forEach((pos,i) => {
+      const fila = 3 + i;
+      mapa.forEach(m => {
+        if(m.p <= pos) {
+          if(m.t==='Ry') A[fila][m.c] = pos - m.p;
+          if(m.t==='M')  A[fila][m.c] = 1;
+        }
+      });
+    });
+
+    // Cargas → lado derecho
+    this.cargasP.forEach(c => {
+      b[0] -= c.Fx;
+      b[1] += c.Fy;           // Fy positiva hacia abajo
+      b[2] += c.Fy * c.pos;
+    });
+    this.cargasD.forEach(d => {
+      const res = this.cargaDistParcial(d, this.L);
+      b[1] += res.F;
+      b[2] += res.F * res.C;
+    });
+    this.articulaciones.forEach((pos,i) => {
+      let mizq = 0;
+      this.cargasP.forEach(c => { if(c.pos < pos) mizq += c.Fy * (pos - c.pos); });
+      this.cargasD.forEach(d => {
+        const res = this.cargaDistParcial(d, pos);
+        mizq += res.F * (pos - res.C);
+      });
+      b[3+i] = -mizq;
+    });
+
+    const x = this.gaussJordan(A.map(r=>r.slice()), b.slice());
+    if(!x) { alert("Error numérico: matriz singular"); return false; }
+
+    this.reacciones = [];
+    mapa.forEach((m,i) => {
+      let nodo = this.reacciones.find(r => Math.abs(r.pos - m.p) < 0.01);
+      if(!nodo) { nodo = {pos:m.p, Rx:0, Ry:0, M:0}; this.reacciones.push(nodo); }
+      nodo[m.t] = x[i];
+    });
+    return true;
+  }
+
+  gaussJordan(A, b) {
+    const n = A.length;
+    for(let i = 0; i < n; i++) {
+      let pivot = i;
+      for(let j = i; j < n; j++) if(Math.abs(A[j][i]) > Math.abs(A[pivot][i])) pivot = j;
+      [A[i], A[pivot]] = [A[pivot], A[i]];
+      [b[i], b[pivot]] = [b[pivot], b[i]];
+
+      if(Math.abs(A[i][i]) < 1e-10) return null;
+
+      for(let j = i+1; j < n; j++) {
+        const factor = A[j][i] / A[i][i];
+        for(let k = i; k < n; k++) A[j][k] -= factor * A[i][k];
+        b[j] -= factor * b[i];
+      }
+    }
+    const x = new Array(n);
+    for(let i = n-1; i >= 0; i--) {
+      x[i] = b[i];
+      for(let j = i+1; j < n; j++) x[i] -= A[i][j] * x[j];
+      x[i] /= A[i][i];
+    }
+    return x;
+  }
+
+  diagramas() {
+    const puntos = 1200;
+    const x = [], N = [], V = [], M = [];
+    for(let i = 0; i <= puntos; i++) {
+      const pos = this.L * i / puntos;
+      x.push(pos);
+      let n=0, v=0, m=0;
+
+      this.reacciones.forEach(r => {
+        if(r.pos <= pos + 1e-6) {
+          n -= r.Rx || 0;
+          v += r.Ry || 0;
+          m += (r.Ry || 0)*(pos - r.pos) + (r.M || 0);
+        }
+      });
+      this.cargasP.forEach(c => {
+        if(c.pos <= pos + 1e-6) {
+          n += c.Fx;
+          v -= c.Fy;
+          m -= c.Fy * (pos - c.pos);
+        }
+      });
+      this.cargasD.forEach(d => {
+        const res = this.cargaDistParcial(d, pos);
+        v -= res.F;
+        m -= res.F * (pos - res.C);
+      });
+      N.push(n); V.push(v); M.push(m);
+    }
+    return {x, N, V, M};
+  }
+
+  dibujarEsquema(divId) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1100;
+    canvas.height = 380;
+    const ctx = canvas.getContext('2d');
+    const esc = canvas.width / this.L;
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Viga
+    ctx.strokeStyle = '#212121';
+    ctx.lineWidth = 12;
+    ctx.beginPath();
+    ctx.moveTo(20, 200);
+    ctx.lineTo(canvas.width-20, 200);
+    ctx.stroke();
+
+    // Apoyos
+    this.reacciones.forEach(r => {
+      const px = 20 + r.pos * esc;
+      if(Math.abs(r.M || 0) > 0.1) {
+        // Empotrado
+        ctx.fillStyle = '#d32f2f';
+        ctx.fillRect(px-30, 140, 60, 120);
+        ctx.fillStyle = '#fff';
+        ctx.fillText("EMP", px-15, 180);
+      } else {
+        // Simple
+        ctx.beginPath();
+        ctx.moveTo(px, 200);
+        ctx.lineTo(px-25, 240);
+        ctx.lineTo(px+25, 240);
+        ctx.closePath();
+        ctx.fillStyle = '#4caf50';
+        ctx.fill();
+      }
+    });
+
+    // Articulaciones
+    this.articulaciones.forEach(pos => {
+      const px = 20 + pos * esc;
+      ctx.beginPath();
+      ctx.arc(px, 200, 18, 0, Math.PI*2);
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    });
+
+    // Cargas puntuales
+    this.cargasP.forEach(c => {
+      if(Math.abs(c.Fy) < 0.1) return;
+      const px = 20 + c.pos * esc;
+      ctx.strokeStyle = '#d32f2f';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(px, 130);
+      ctx.lineTo(px, 60);
+      ctx.stroke();
+      // Triángulo
+      ctx.beginPath();
+      ctx.moveTo(px-15, 75);
+      ctx.lineTo(px, 60);
+      ctx.lineTo(px+15, 75);
+      ctx.fillStyle = '#d32f2f';
+      ctx.fill();
+      ctx.fillStyle = 'black';
+      ctx.font = 'bold 16px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(c.Fy + " N", px, 45);
+    });
+
+    // Cargas distribuidas
+    this.cargasD.forEach(d => {
+      const xi = 20 + d.ini * esc;
+      const xf = 20 + d.fin * esc;
+      const hMax = 100;
+      const escala = hMax / (Math.max(Math.abs(d.w_ini), Math.abs(d.w_fin)) || 1);
+      ctx.fillStyle = 'rgba(33,150,243,0.3)';
+      ctx.strokeStyle = '#1976d2';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(xi, 200);
+      for(let t=0; t<=1; t+=0.02) {
+        let y;
+        if(d.tipo === "Parabólica") {
+          y = d.w_ini + (d.w_fin - d.w_ini) * (t**2);
+        } else {
+          y = d.w_ini + (d.w_fin - d.w_ini) * t;
+        }
+        ctx.lineTo(xi + t*(xf-xi), 200 - y*escala);
+      }
+      ctx.lineTo(xf, 200);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    document.getElementById(divId).innerHTML = "";
+    document.getElementById(divId).appendChild(canvas);
+  }
+}
+
+// ==================== aqui va la función principal v: ====================
+function calcular() {
+  const L = parseFloat(document.getElementById("L").value);
+  if(isNaN(L) || L <= 0) { alert("Longitud inválida"); return; }
+  const viga = new Viga(L);
+
+  viga.addArticulacion(document.getElementById("articulacion").value);
+
+  // Apoyos
+  document.querySelectorAll("#apoyosTable select").forEach((sel, i) => {
+    const posInput = sel.closest("tr").querySelector("input");
+    if(sel.value && posInput.value) viga.addApoyo(sel.value, posInput.value);
+  });
+
+  // Cargas puntuales
+  document.querySelectorAll("#puntualesTable tr").forEach(tr => {
+    const sel = tr.cells[0].querySelector("select");
+    const val = tr.cells[1].querySelector("input").value;
+    const pos = tr.cells[2].querySelector("input").value;
+    if(!val || !pos) return;
+    const valor = parseFloat(val);
+    const posicion = parseFloat(pos);
+    if(sel.value.includes("Fy")) viga.addCargaPuntual(0, valor, posicion);
+    if(sel.value.includes("Fx")) viga.addCargaPuntual(valor, 0, posicion);
+  });
+
+  // Cargas distribuidas
+  document.querySelectorAll("#distribuidasTable tr").forEach(tr => {
+    const sel = tr.cells[0].querySelector("select");
+    const wi = tr.cells[1].querySelector("input").value;
+    const wf = tr.cells[2].querySelector("input").value;
+    const ini = tr.cells[3].querySelector("input").value;
+    const fin = tr.cells[4].querySelector("input").value;
+    if(sel.value) viga.addCargaDist(wi, wf, ini, fin, sel.value);
+  });
+
+  if(!viga.resolverReacciones()) return;
+
+  const data = viga.diagramas();
+  viga.dibujarEsquema("esquema");
+
+  const layout = {
+    showlegend: false,
+    xaxis: {title: "Posición (m)"},
+    height: 320,
+    margin: {t:40, b:60, l:60, r:20}
+  };
+
+  Plotly.newPlot('axial',    [{x:data.x, y:data.N, fill:'tonexty', line:{color:'darkblue'}}], {...layout, yaxis:{title:"Axial (N)"}, plot_bgcolor:"#f8f9fa"});
+  Plotly.newPlot('cortante', [{x:data.x, y:data.V, fill:'tonexty', line:{color:'darkgreen'}}], {...layout, yaxis:{title:"Cortante (N)"}});
+  Plotly.newPlot('momento',  [{x:data.x, y:data.M, fill:'tonexty', line:{color:'darkred'}}], {...layout, yaxis:{title:"Momento (N·m)"}});
+
+  let tabla = "<h3>Reacciones</h3><table style='margin:auto; border-collapse:collapse' border='1'><tr><th>Pos (m)</th><th>Rx (N)</th><th>Ry (N)</th><th>M (N·m)</th></tr>";
+  viga.reacciones.forEach(r => {
+    tabla += `<tr><td>${r.pos.toFixed(2)}</td><td>${(r.Rx||0).toFixed(2)}</td><td>${(r.Ry||0).toFixed(2)}</td><td>${(r.M||0).toFixed(2)}</td></tr>`;
+  });
+  tabla += "</table>";
+  document.getElementById("reacciones").innerHTML = tabla;
+
+  document.getElementById("resultados").style.display = "block";
+  document.getElementById("resultados").scrollIntoView({behavior: "smooth"});
+}
+
+// ===== esto es para que inicie al cargar la pagina, simplemente =======
+window.onload = function() {
+  crearTablas();
+};
+</script>
+</body>
+</html>
