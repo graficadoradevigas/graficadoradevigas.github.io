@@ -5,16 +5,40 @@
 <title>Viga Isostática Web</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  body { font-family: "Comic Sans MS", "Comic Sans", cursive; margin:0; background:#2b40ff; padding:0; }
-  header {
-  background: rgb(18, 29, 88);
+ body {
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+  background: #252e83;
+  padding: 0;
+  animation: colorChange 10s infinite alternate; /* Aplica la animación */
+}
+
+@keyframes colorChange {
+  0% { background-color: #2b3592; } /* Azul oscuro original */
+  25% { background-color: #2a3a9a; } /* Un tono de azul ligeramente diferente */
+  50% { background-color: #3b4bac; } /* Otro tono de azul */
+  75% { background-color: #4c5dbe; } /* Un azul un poco más claro */
+  100% { background-color: #252f84; } /* Vuelve al azul original */
+}
+
+/* aca empieza el header */
+header {
+  background: rgba(18, 29, 88, 0.7); /* Hacemos el fondo semi-transparente para el efecto glass */
   padding: 20px 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 30px;
+  max-width: 1200px;
+  margin: 30px auto 20px auto;
+  border-radius: 15px;
+  backdrop-filter: blur(10px) saturate(180%); /* Desenfoque y saturación para el efecto de vidrio */
+  -webkit-backdrop-filter: blur(10px) saturate(180%); /* Prefijo para compatibilidad con navegadores */
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Sombra con un ligero desenfoque */
 }
+
+/* aca termina el header*/
 
 .logo {
   height: 105px;
@@ -23,7 +47,7 @@
 }
 
 .titulo {
-  height: 200px;      
+  height: 150px;      
   display: block;
   margin: 0 auto;     
 }
@@ -34,16 +58,19 @@
 
 .nombres a {
   display: block;
-  background: rgba(19, 31, 109, 0.25);   /* azul oscuro muy transparente */
-  color: #e0e0ff;                        /* texto casi blanco, suave */
-  padding: 10px 20px;
-  margin: 6px 0;
+  background: rgba(19, 31, 109, 0.25);
+  color: #e0e0ff;
+  /* REDUCIDO: Se disminuyó el relleno vertical (arriba/abajo) de 10px a 5px */
+  padding: 5px 20px;
+  /* MANTENIDO: El margen vertical es pequeño (3px) y no se modifica */
+  margin: 3px 0;
   border-radius: 10px;
-  font-weight: normal;                   /* sin negrita */
-  font-family: "Comic Sans MS", "Comic Sans", cursive;  /* sí, Comic Sans 100% */
-  font-size: 1.05em;
+  font-weight: normal;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  /* REDUCIDO: Se disminuyó un poco el tamaño de la fuente de 0.95em a 0.85em */
+  font-size: 0.85em;
   text-decoration: none;
-  backdrop-filter: blur(4px);            /* efecto vidrio esmerilado (opcional, queda lindo) */
+  backdrop-filter: blur(4px);
   border: 1px solid rgba(100, 120, 255, 0.2);
   transition: all 0.3s ease;
   margin-right: 20px;
@@ -71,23 +98,44 @@
 }
 
 
+/* este css esta echo un caos, pero funciona*/
+h1 { margin: 0; font-size: 1.8em; }
+.subtitle { font-size: 0.9em; opacity: 0.9; }
 
-  h1 { margin:0; font-size:2.5em; }
-  .subtitle { font-size:1.1em; opacity:0.9; }
-  .container { max-width:1200px; margin:30px auto; padding:20px; background:rgb(255, 172, 227); border-radius:12px; box-shadow:0 8px 30px rgba(246, 198, 198, 0.15); }
-  .section { margin-bottom:30px; padding:20px; border:1px solid #9fd1ee; border-radius:10px; background:#0f41c0; }
-  .section h3 { margin-top:0; color:#c8fa7d; font-size:1.4em; }
-  table { width:100%; border-collapse:collapse; }
-  td { padding:10px; vertical-align:middle; }
-  input, select { padding:10px; border:1px solid #ccc; border-radius:6px; width:100%; box-sizing:border-box; font-size:1em; }
-  button { 
-    background:#d32f2f; color:white; padding:15px 40px; font-size:1.3em; 
-    border:none; border-radius:8px; cursor:pointer; margin:30px auto; display:block;
-    box-shadow:0 4px 15px rgba(211,47,47,0.4);
-  }
-  button:hover { background:#b71c1c; transform:scale(1.05); }
-  .resultados { margin-top:40px; padding:20px; background:#f8f9fa; border-radius:10px; }
-  footer { text-align:center; padding:30px; color:#ffffff; }
+/* CONTENEDOR CON EFECTO GLASS */
+.container {
+  max-width: 1200px;
+  margin: 15px auto;
+  padding: 15px;
+  background: rgba(131, 147, 237, 0.5); /* Fondo semi-transparente */
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); /* Sombra más grande */
+  backdrop-filter: blur(8px); /* Efecto Glass */
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* SECCIONES CON EFECTO GLASS */
+.section {
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px solid rgba(159, 209, 238, 0.5); /* Borde semi-transparente */
+  border-radius: 8px;
+  background: rgba(56, 103, 222, 0.3); /* Fondo semi-transparente */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  backdrop-filter: blur(4px); /* Efecto Glass */
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.section h3 { margin-top: 0; color: #f9d41e; font-size: 1.2em; }
+.flex-row-container { display: flex; gap: 20px; margin-bottom: 20px; }
+.flex-row-container .section { flex: 1; margin-bottom: 0; }
+table { width: 100%; border-collapse: collapse; }
+td { padding: 8px; vertical-align: middle; }
+input, select { padding: 8px; border: 1px solid #c0daf9; border-radius: 5px; width: 100%; box-sizing: border-box; font-size: 0.9em; }
+button { background: #d32f2f; color: white; padding: 12px 30px; font-size: 1.1em; border: none; border-radius: 6px; cursor: pointer; margin: 20px auto; display: block; box-shadow: 0 3px 10px rgba(211,47,47,0.4); }
+button:hover { background: #b71c1c; transform: scale(1.03); }
+.resultados { margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+footer { text-align: center; padding: 20px; color: #ffffff; font-size: 0.85em; }
 </style>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
@@ -102,56 +150,74 @@
         </div>
       
         <div class="nombres">
-          <a href="joel.html" target="_blank">Palacios Rivera Joel Moisés</a>
-          <a href="aldahir.html" target="_blank">Malvaceda Roca Aldahir Arturo</a>
-          <a href="alejando.html" target="_blank">Arosemena Elescano, Alejandro Miguel</a>
+
+          <a href="joel.html" target="_blank"> integrante 1: Palacios Rivera Joel Moisés</a>
+          <a href="aldahir.html" target="_blank">integrante 2: Malvaceda Roca Aldahir Arturo</a>
+          <a href="alejando.html" target="_blank">integrante 3: Arosemena Elescano, Alejandro Miguel</a>
+          <a href="alejando.html" target="_blank">Docente: M.Sc. Ing. Edén Angel Capcha Molina</a>
         </div>
       </header>
 
-<div class="container">
+      <div class="container">
 
-  <div class="section">
-    <h3>Geometría de la viga</h3>
-    <table>
-      <tr><td>Longitud L (m)</td><td><input type="number" id="L" value="10" step="0.1" min="1"></td></tr>
-      <tr><td>Articulación interna (m) <small>(opcional)</small></td><td><input type="number" id="articulacion" placeholder="Ej: 5" step="0.1"></td></tr>
-    </table>
-  </div>
+        <div class="flex-row-container">
+            
+            <div class="section">
+                <h3>Geometría de la viga</h3>
+                <table>
+                    <tr><td>Longitud L (m)</td><td><input type="number" id="L" value="10" step="0.1" min="1"></td></tr>
+                    <tr><td>Articulación interna (m) <small>(opcional)</small></td><td><input type="number" id="articulacion" placeholder="Ej: 5" step="0.1"></td></tr>
+                </table>
+            </div>
+    
+            <div class="section">
+                <h3>Apoyos (máximo 3)</h3>
+                <table id="apoyosTable"></table>
+            </div>
+    
+        </div>
+        <div class="flex-row-container">
+            
+            <div class="section">
+                <h3>Cargas puntuales (máximo 6)</h3>
+                <table id="puntualesTable"></table>
+            </div>
+    
+            <div class="section">
+                <h3>Cargas distribuidas</h3>
+                <table id="distribuidasTable"></table>
+            </div>
+    
+        </div>
+        
+        <button onclick="calcular()">CALCULAR DIAGRAMAS</button>
+    
+        <div class="resultados" id="resultados" style="display:none;">
+            <h2 style="text-align:center; color:#d32f2f;">Resultados del Análisis</h2>
+            <h3>Esquema de la viga</h3>
+            <div id="esquema" style="text-align:center;"></div>
+            <h3>Diagrama de fuerza axial</h3>
+            <div id="axial"></div>
+            <h3>Diagrama de cortante</h3>
+            <div id="cortante"></div>
+            <h3>Diagrama de momento flector</h3>
+            <div id="momento"></div>
+            <div id="reacciones"></div>
+        </div>
+    </div>
 
-  <div class="section">
-    <h3>Apoyos (máximo 3)</h3>
-    <table id="apoyosTable"></table>
-  </div>
-
-  <div class="section">
-    <h3>Cargas puntuales (máximo 6)</h3>
-    <table id="puntualesTable"></table>
-  </div>
-
-  <div class="section">
-    <h3>Cargas distribuidas</h3>
-    <table id="distribuidasTable"></table>
-  </div>
-
-  <button onclick="calcular()">CALCULAR DIAGRAMAS</button>
-
-  <div class="resultados" id="resultados" style="display:none;">
-    <h2 style="text-align:center; color:#d32f2f;">Resultados del Análisis</h2>
-    <h3>Esquema de la viga</h3>
-    <div id="esquema" style="text-align:center;"></div>
-    <h3>Diagrama de fuerza axial</h3>
-    <div id="axial"></div>
-    <h3>Diagrama de cortante</h3>
-    <div id="cortante"></div>
-    <h3>Diagrama de momento flector</h3>
-    <div id="momento"></div>
-    <div id="reacciones"></div>
-  </div>
-</div>
-
-<footer>© Team Mandarina</footer>
+<footer>© Team Mandarina - Ciclo 2025 - I</footer>
 
 <script>
+
+
+//───────────────▄▄───▐█
+//───▄▄▄───▄██▄──█▀───█─▄
+//─▄██▀█▌─██▄▄──▐█▀▄─▐█▀
+//▐█▀▀▌───▄▀▌─▌─█─▌──▌─▌
+//▌▀▄─▐──▀▄─▐▄─▐▄▐▄─▐▄─▐▄
+
+
 // ==================== GENERAR TABLAS AL CARGAR LA PÁGINA ====================
 function crearTablas() {
   // Apoyos (3 filas)
@@ -203,7 +269,7 @@ function crearTablas() {
   }
 }
 
-// ==================== CLASE VIGA (100% funcional y probada) ====================
+// ==================== CLASE VIGA (100% funcional y probada en la pc del puneño) ====================
 class Viga {
   constructor(L) {
     this.L = L;
@@ -256,7 +322,7 @@ class Viga {
     return {F: Ftotal, C: Ctotal};
   }
 
-  resolverReacciones() {
+  resolverReacciones() { //comprobemosss
     let incognitas = 0;
     this.apoyos.forEach(a => {
       if(a.tipo==="empotrado") incognitas += 3;
@@ -285,7 +351,7 @@ class Viga {
       }
     });
 
-    // ΣFx = 0, ΣFy = 0, ΣM = 0
+    // ΣFx = 0, ΣFy = 0, ΣM = 0, primera ley de nwton
     mapa.forEach(m => {
       if(m.t==='Rx') A[0][m.c] = 1;
       if(m.t==='Ry') A[1][m.c] = 1;
@@ -337,7 +403,7 @@ class Viga {
     return true;
   }
 
-  gaussJordan(A, b) {
+  gaussJordan(A, b) { //resolvemos con gaus, no keda de otra :C
     const n = A.length;
     for(let i = 0; i < n; i++) {
       let pivot = i;
@@ -561,7 +627,7 @@ function calcular() {
   document.getElementById("resultados").scrollIntoView({behavior: "smooth"});
 }
 
-// ===== esto es para que inicie al cargar la pagina, simplemente =======
+// esto es para que inicie al cargar la pagina, simplemente
 window.onload = function() {
   crearTablas();
 };
