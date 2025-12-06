@@ -60,14 +60,11 @@ header {
   display: block;
   background: rgba(19, 31, 109, 0.25);
   color: #e0e0ff;
-  /* REDUCIDO: Se disminuyó el relleno vertical (arriba/abajo) de 10px a 5px */
   padding: 5px 20px;
-  /* MANTENIDO: El margen vertical es pequeño (3px) y no se modifica */
   margin: 3px 0;
   border-radius: 10px;
   font-weight: normal;
   font-family: "Comic Sans MS", "Comic Sans", cursive;
-  /* REDUCIDO: Se disminuyó un poco el tamaño de la fuente de 0.95em a 0.85em */
   font-size: 0.85em;
   text-decoration: none;
   backdrop-filter: blur(4px);
@@ -142,7 +139,9 @@ footer { text-align: center; padding: 20px; color: #ffffff; font-size: 0.85em; }
 <body>
 
     <header>
+      <a href="documentos.html">
         <img src="logo_uni.png" alt="UNI" class="logo">
+      </a>
       
         <!-- ENVUELVE EL GIF EN UN DIV, esto es la magia -->
         <div class="centro-titulo">
@@ -461,108 +460,158 @@ class Viga {
   }
 
   dibujarEsquema(divId) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1100;
-    canvas.height = 380;
-    const ctx = canvas.getContext('2d');
-    const esc = canvas.width / this.L;
+  const canvas = document.createElement('canvas');
+  canvas.width = 1100;
+  canvas.height = 380;
+  const ctx = canvas.getContext('2d');
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+  // === CONFIGURACIÓN DE LAYOUT ===
+  const margenIzq = 40;
+  const margenDer = 40;
+  const yViga = 200;
+  const anchoUtil = canvas.width - margenIzq - margenDer;
+  const esc = anchoUtil / this.L;  // píxeles por unidad de longitud
 
-    // Viga
-    ctx.strokeStyle = '#212121';
-    ctx.lineWidth = 12;
-    ctx.beginPath();
-    ctx.moveTo(20, 200);
-    ctx.lineTo(canvas.width-20, 200);
-    ctx.stroke();
+  const xInicioViga = margenIzq;
+  const xFinViga = margenIzq + this.L * esc;
 
-    // Apoyos
-    this.reacciones.forEach(r => {
-      const px = 20 + r.pos * esc;
-      if(Math.abs(r.M || 0) > 0.1) {
-        // Empotrado
-        ctx.fillStyle = '#d32f2f';
-        ctx.fillRect(px-30, 140, 60, 120);
-        ctx.fillStyle = '#fff';
-        ctx.fillText("EMP", px-15, 180);
-      } else {
-        // Simple
-        ctx.beginPath();
-        ctx.moveTo(px, 200);
-        ctx.lineTo(px-25, 240);
-        ctx.lineTo(px+25, 240);
-        ctx.closePath();
-        ctx.fillStyle = '#4caf50';
-        ctx.fill();
-      }
-    });
+  // Función auxiliar: convierte posición real (0 a L) → coordenada X en canvas
+  const posAViga = (pos) => xInicioViga + pos * esc;
 
-    // Articulaciones
-    this.articulaciones.forEach(pos => {
-      const px = 20 + pos * esc;
-      ctx.beginPath();
-      ctx.arc(px, 200, 18, 0, Math.PI*2);
-      ctx.fillStyle = 'white';
-      ctx.fill();
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 4;
-      ctx.stroke();
-    });
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Cargas puntuales
-    this.cargasP.forEach(c => {
-      if(Math.abs(c.Fy) < 0.1) return;
-      const px = 20 + c.pos * esc;
-      ctx.strokeStyle = '#d32f2f';
-      ctx.lineWidth = 5;
-      ctx.beginPath();
-      ctx.moveTo(px, 130);
-      ctx.lineTo(px, 60);
-      ctx.stroke();
-      // Triángulo
-      ctx.beginPath();
-      ctx.moveTo(px-15, 75);
-      ctx.lineTo(px, 60);
-      ctx.lineTo(px+15, 75);
+  // === VIGA ===
+  ctx.strokeStyle = '#212121';
+  ctx.lineWidth = 12;
+  ctx.beginPath();
+  ctx.moveTo(xInicioViga, yViga);
+  ctx.lineTo(xFinViga, yViga);
+  ctx.stroke();
+
+  // === APOYOS ===
+  this.reacciones.forEach(r => {
+    const px = posAViga(r.pos);
+
+    if (Math.abs(r.M || 0) > 0.1) {
+      // Empotrado
       ctx.fillStyle = '#d32f2f';
-      ctx.fill();
-      ctx.fillStyle = 'black';
-      ctx.font = 'bold 16px Arial';
+      ctx.fillRect(px - 30, yViga - 60, 60, 120);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 20px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText(c.Fy + " N", px, 45);
-    });
-
-    // Cargas distribuidas
-    this.cargasD.forEach(d => {
-      const xi = 20 + d.ini * esc;
-      const xf = 20 + d.fin * esc;
-      const hMax = 100;
-      const escala = hMax / (Math.max(Math.abs(d.w_ini), Math.abs(d.w_fin)) || 1);
-      ctx.fillStyle = 'rgba(33,150,243,0.3)';
-      ctx.strokeStyle = '#1976d2';
-      ctx.lineWidth = 3;
+      ctx.fillText("EMP", px, yViga - 15);
+    } else {
+      // Apoyo simple
       ctx.beginPath();
-      ctx.moveTo(xi, 200);
-      for(let t=0; t<=1; t+=0.02) {
-        let y;
-        if(d.tipo === "Parabólica") {
-          y = d.w_ini + (d.w_fin - d.w_ini) * (t**2);
-        } else {
-          y = d.w_ini + (d.w_fin - d.w_ini) * t;
-        }
-        ctx.lineTo(xi + t*(xf-xi), 200 - y*escala);
-      }
-      ctx.lineTo(xf, 200);
+      ctx.moveTo(px, yViga);
+      ctx.lineTo(px - 25, yViga + 40);
+      ctx.lineTo(px + 25, yViga + 40);
       ctx.closePath();
+      ctx.fillStyle = '#4caf50';
       ctx.fill();
-      ctx.stroke();
-    });
+    }
+  });
 
-    document.getElementById(divId).innerHTML = "";
-    document.getElementById(divId).appendChild(canvas);
-  }
+  // === ARTICULACIONES ===
+  this.articulaciones.forEach(pos => {
+    const px = posAViga(pos);
+    ctx.beginPath();
+    ctx.arc(px, yViga, 18, 0, Math.PI * 2);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+  });
+
+  //FLECHA
+  this.cargasP.forEach(c => {
+  if (Math.abs(c.Fy) < 0.1) return;
+
+  const px = posAViga(c.pos);
+
+  const ARROW_HEAD = 18;                // tamaño de la punta
+  const LONGITUD_FLECHA = 120;          // longitud del tallo
+  const SEPARACION_VIGA = 30;           // cuántos píxeles encima de la viga empieza todo
+
+  // Posiciones clave
+  const yCentroTriangulo = yViga - SEPARACION_VIGA;                    // centro de la base del triángulo
+  const yInicioLinea     = yCentroTriangulo - LONGITUD_FLECHA;         // donde empieza la línea (arriba)
+
+  // 1. Línea de la flecha
+  ctx.strokeStyle = '#d32f2f';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(px, yInicioLinea);
+  ctx.lineTo(px, yCentroTriangulo);
+  ctx.stroke();
+
+  // 2. Triángulo apuntando hacia abajo (perfectamente unido)
+  ctx.beginPath();
+  ctx.moveTo(px - ARROW_HEAD, yCentroTriangulo - ARROW_HEAD);
+  ctx.lineTo(px, yCentroTriangulo + ARROW_HEAD);     // punta
+  ctx.lineTo(px + ARROW_HEAD, yCentroTriangulo - ARROW_HEAD);
+  ctx.closePath();
+  ctx.fillStyle = '#d32f2f';
+  ctx.fill();
+
+  // 3. Texto: justo encima del triángulo + unos pocos píxeles arriba → NUNCA se sale
+  ctx.fillStyle = 'black';
+  ctx.font = 'bold 20px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+
+  const yTexto = yCentroTriangulo - ARROW_HEAD - 115;   // 8 px encima de la base del triángulo
+
+  ctx.fillText(
+    `${c.Fy > 0 ? '−' : ''}${Math.abs(c.Fy).toFixed(0)} N`,
+    px,
+    yTexto
+  );
+});
+
+  // === CARGAS DISTRIBUIDAS (hacia abajo también) ===
+  this.cargasD.forEach(d => {
+    const xi = posAViga(d.ini);
+    const xf = posAViga(d.fin);
+    const hMax = 120;
+    const maxW = Math.max(Math.abs(d.w_ini), Math.abs(d.w_fin));
+    const escala = maxW > 0.1 ? hMax / maxW : 1;
+
+    ctx.fillStyle = 'rgba(33,150,243,0.3)';
+    ctx.strokeStyle = '#1976d2';
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    ctx.moveTo(xi, yViga);
+
+    for (let t = 0; t <= 1; t += 0.02) {
+      let w;
+      if (d.tipo === "Parabólica") {
+        w = d.w_ini + (d.w_fin - d.w_ini) * (t * t);
+      } else {
+        w = d.w_ini + (d.w_fin - d.w_ini) * t;
+      }
+      // Si la carga es positiva (hacia abajo, negativa hacia arriba
+      const direccion = d.w_ini >= 0 && d.w_fin >= 0 ? 1 : -1;
+      ctx.lineTo(xi + t * (xf - xi), yViga + direccion * Math.abs(w) * escala);
+    }
+
+    ctx.lineTo(xf, yViga);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  // Insertar en el DOM
+  const contenedor = document.getElementById(divId);
+  contenedor.innerHTML = '';
+  contenedor.appendChild(canvas);
 }
+}
+
+
+
 
 // ==================== aqui va la función principal v: ====================
 function calcular() {
